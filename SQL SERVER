@@ -1,0 +1,71 @@
+create database March_WebApi
+use March_WebApi
+CREATE TABLE Customer (
+    CustomerID INT IDENTITY(1,1) PRIMARY KEY,
+    FirstName NVARCHAR(50) NOT NULL,
+    LastName NVARCHAR(50) NOT NULL,
+    Email NVARCHAR(100) UNIQUE NOT NULL,
+    Phone NVARCHAR(15) NULL,
+    
+);
+INSERT INTO Customer (FirstName, LastName, Email, Phone)
+VALUES 
+    ('John', 'Doe', 'john.doe@example.com', '1234567890'),
+    ('Jane', 'Smith', 'jane.smith@example.com', '0987654321'),
+    ('Alice', 'Brown', 'alice.brown@example.com', NULL),
+    ('Bob', 'Johnson', 'bob.johnson@example.com', '5678901234');
+
+select * from Customer
+
+--GETALL
+create proc GetAllCustomer
+as
+begin
+select * from Customer
+end
+
+--GETBYID
+CREATE PROCEDURE GetByIdCustomer  
+    @CustomerID INT  
+AS  
+BEGIN  
+    SELECT * FROM Customer WHERE CustomerID = @CustomerID  
+END
+
+--SAVE
+CREATE PROCEDURE SaveCustomer  
+    
+    @FirstName NVARCHAR(50),  
+    @LastName NVARCHAR(50),  
+    @Email NVARCHAR(100),  
+    @Phone NVARCHAR(20)  
+AS  
+BEGIN  
+    INSERT INTO Customer ( FirstName, LastName, Email, Phone)  
+    VALUES (@FirstName, @LastName, @Email, @Phone);  
+END
+
+--DELETE
+create proc deletecustomer
+ @CustomerID INT 
+ as
+ begin 
+ delete from Customer where CustomerID = @CustomerID  
+ end
+
+ --UPDATE
+ CREATE PROCEDURE UpdateCustomer  
+    @CustomerID INT,  
+    @FirstName NVARCHAR(50),  
+    @LastName NVARCHAR(50),  
+    @Email NVARCHAR(100),  
+    @Phone NVARCHAR(20)  
+AS  
+BEGIN  
+    UPDATE Customer  
+    SET FirstName = @FirstName,  
+        LastName = @LastName,  
+        Email = @Email,  
+        Phone = @Phone  
+    WHERE CustomerID = @CustomerID;  
+END
