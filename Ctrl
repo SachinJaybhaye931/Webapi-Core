@@ -1,0 +1,161 @@
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using System.Data;
+using System.Data.SqlClient;
+
+namespace March_WepApi.Controllers
+{
+
+    public class CustomerModel
+    {
+        public int CustomerID { get; set; }
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
+        public string Email { get; set; }
+        public string Phone { get; set; }
+
+
+    }
+    [Route("api/[controller]")]
+    [ApiController]
+    public class CustomerCtrlController : ControllerBase
+    {
+
+
+        [HttpGet]
+        [Route("GetAll")]
+        public List<CustomerModel> GetAll()
+        {
+            string str = @"Data Source=IAMSACHIN\SQLEXPRESS; initial catalog=March_WebApi; Integrated security=true";
+            SqlConnection con = new SqlConnection(str);
+            SqlCommand cmd = new SqlCommand("GetAllCustomer", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            DataSet ds = new DataSet();
+            da.Fill(ds);
+            DataTable dt = new DataTable();
+            dt = ds.Tables[0];
+
+            List<CustomerModel> lst = new List<CustomerModel>();
+
+            foreach (DataRow item in dt.Rows)
+            {
+                lst.Add(new CustomerModel()
+                {
+                    CustomerID = Convert.ToInt32(item["CustomerID"]),
+                    FirstName = item["FirstName"].ToString(),
+                    LastName = item["LastName"].ToString(),
+                    Email = item["Email"].ToString(),
+                    Phone = item["Phone"].ToString(),
+
+                });
+
+            }
+            return lst;
+        }
+
+        [HttpGet]
+        [Route("GetByID")]
+
+        public List<CustomerModel> GetByID(int CustomerID)
+        {
+
+            string str = @"Data Source=IAMSACHIN\SQLEXPRESS; initial catalog=March_WebApi; Integrated security=true";
+            SqlConnection Sc = new SqlConnection(str);
+            SqlCommand cmd = new SqlCommand("GetByIdCustomer", Sc);
+
+            cmd.Parameters.AddWithValue("@CustomerID", @CustomerID);
+            cmd.CommandType = CommandType.StoredProcedure;
+            SqlDataAdapter DA = new SqlDataAdapter(cmd);
+            DataSet DS = new DataSet();
+            DA.Fill(DS);
+            DataTable DT = DS.Tables[0];
+            DT = DS.Tables[0];
+
+            List<CustomerModel> lst = new List<CustomerModel>();
+            foreach (DataRow item in DT.Rows)
+            {
+                lst.Add(new CustomerModel()
+                {
+                    CustomerID = Convert.ToInt32(item["CustomerID"]),
+                    FirstName = item["FirstName"].ToString(),
+                    LastName = item["LastName"].ToString(),
+                    Email = item["Email"].ToString(),
+                    Phone = item["Phone"].ToString(),
+
+                });
+            }
+            return lst;
+
+        }
+
+
+        [HttpPost]
+        [Route("SaveCustomer")]
+        public int SaveCustomer(CustomerModel model)
+        {
+            string str = @"Data Source=IAMSACHIN\SQLEXPRESS; initial catalog=March_WebApi; Integrated security=true";
+            SqlConnection Sc = new SqlConnection(str);
+            SqlCommand cmd = new SqlCommand("SaveCustomer", Sc);
+            cmd.CommandType = CommandType.StoredProcedure;
+
+
+            
+            cmd.Parameters.AddWithValue("@FirstName", model.FirstName);
+            cmd.Parameters.AddWithValue("@LastName", model.LastName);
+            cmd.Parameters.AddWithValue("@Email", model.Email);
+            cmd.Parameters.AddWithValue("@Phone", model.Phone);
+
+            Sc.Open();
+            int res = cmd.ExecuteNonQuery();
+            Sc.Close();
+            return res;
+        }
+
+
+        [HttpDelete]
+        [Route("DeleteCustomer")]
+        public int DeleteCustomer(int CustomerID)
+        {
+            string str = @"Data Source=IAMSACHIN\SQLEXPRESS; initial catalog=March_WebApi; Integrated security=true";
+            SqlConnection Sc = new SqlConnection(str);
+            SqlCommand cmd = new SqlCommand("deletecustomer", Sc);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@CustomerID", CustomerID);
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            Sc.Open();
+            int res = cmd.ExecuteNonQuery();
+            Sc.Close();
+
+
+            return res;
+        }
+        [HttpPost]
+        [Route("UpdateCustomer")]
+        public int UpdateCustomer(CustomerModel model)
+        {
+            string str = @"Data Source=IAMSACHIN\SQLEXPRESS; initial catalog=March_WebApi; Integrated security=true";
+            using (SqlConnection Sc = new SqlConnection(str))
+            {
+                using (SqlCommand cmd = new SqlCommand("UpdateCustomer", Sc))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue("@CustomerID", model.CustomerID); // Ensure CustomerID is provided
+                    cmd.Parameters.AddWithValue("@FirstName", model.FirstName);
+                    cmd.Parameters.AddWithValue("@LastName", model.LastName);
+                    cmd.Parameters.AddWithValue("@Email", model.Email);
+                    cmd.Parameters.AddWithValue("@Phone", model.Phone);
+
+                    Sc.Open();
+                    int res = cmd.ExecuteNonQuery();
+                    Sc.Close();
+                    return res;
+                }
+            }
+        }
+
+
+    }
+}
